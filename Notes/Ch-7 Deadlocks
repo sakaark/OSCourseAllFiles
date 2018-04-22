@@ -1,0 +1,103 @@
+Chapter 7 - Deadlocks
+
+7.1 System Model
+ Resource types can be CPU, files, I/O devices etc.Each type can have several instances and all the instances must be identical(in terms of the function they perform)
+ Mode of resource usage: Possible request; use; Release 
+
+7.2 Deadlock Characterization
+    7.2.1 Necessary Conditions
+     Mutual Exclusion-Process must have some resource that can't be shared;   Hold and Wait-Every process must hold some resource and wait for another resource;
+     No Preemption-Resources cant be preempted	      	   	    	      Circular wait-{P1,...,Pn} this condition implies hold and wait.
+     All the conditions must necessarily hold. Without even 1 condition system is not in deadlock.
+
+    7.2.2 Resource-Allocation Graph
+     Nodes and Edges. Cycle-necessary. Single instance of each resource - deadlock. only cycles(all processes waiting) - deadlock. rest - possibility of deadlock
+
+7.3 Methods for Handling Deadlocks
+ Ensuring-deadlock prevention and deadlock avoidance; Deadlock detection and recovery; Nothing(Used by most operating systems)
+
+7.4 Deadlock Prevention
+ Ensure one of the conditions never hold.
+
+    7.4.1 Mutual Exclusion
+     We cant prevent deadlocks by denying mutual exclusion because some resources just cant be shared!
+
+    7.4.2 Hold and Wait
+     Request all at the beginning. Request only if you have none. Problems-Low device utilization; multiple requests for same resource; starvation
+
+    7.4.3 No Preemption
+     If can't be satisfied then, we preempt all the resources. If we ask and the resource is used by a process which is waiting then we preempt it.
+
+    7.4.4 Circular Wait
+     Every process can ask for resources only in an increasing order of their index; Can only request a process that has highest no. among all resources held.
+
+7.5 Deadlock Avoidance
+ Requires apriori information of the sequence of requests and releases for each process. At resource request system decides if it should be granted or not.
+ Simplest algo for this: We are given max no of resources of each type that a process needs. We then dynamically check resource allocations state to ensure that 
+ circular wait never occurs.
+     
+    7.5.1 Safe State
+     A state is safe if system can allocate resources in some order and avoid a deadlock.
+     A seq of processes <P1...PN> are safe if for every possible request of Pi its resources are held only by Pj and j<i. All other states are unsafe.
+     From unsafe state there is always a possible request sequence such that system may result in deadlock, but it is not necessary that such a sequence must occur.
+     A system may request a resource that is available but still have to wait, thus the resource utilization is not as good.
+
+    7.5.2 Resource-Allocation-Graph Algorithm
+     Only when all resources have single instance. Claim edge from process to resource and edge transformations.
+     A request can be allocated if allocating a request doesn't create a cycle in the graph(including claim edges). O(n^2) for cycle detection n=number of processes.
+
+    7.5.3 Banker's Algorithm
+     Available(1xm), Max(nxm), Allocation(nxm), Need(nxm).
+    	  7.5.3.1 Safety Algorithm
+	   See the appendix
+
+	  7.5.3.2 Resource-Request Algorithm
+	   see the appendix
+
+	  7.5.3.3 An Illlustrative Example
+	   easy peasy
+
+7.6 Deadlock Detection
+    7.6.1 Single Instance of Each Resource Type
+     Systems needs to maintain a wait-for graph and periodically needs to check for a cycle.
+
+    7.6.2 Several Instances of a Resource Type
+     Exactly same as Banker's algorithm, just replace need by request. This is an optimistic algorithm.
+     Though the algorithm looks exactly the same they are actually doing very very different things semantically.
+
+    7.6.3 Detection-Algorithm Usage
+     Depends on how likely is a deadlock to occur. On one extreme we can run a deadlock detection algorithm every time the resource is not allocated. Here we can
+     detect the exact process that caused the deadlock.
+     A possible solution is to use it less frequently say once an hoour or maybe when the cpu utilization becomes less than 40% as deadlocks tend to cripple the cpu.
+
+7.7 Recovery From Deadlock
+ Possibilities are Manual recovery(informint the user that the deadlock has occured); Process termination to break the circular wait; preempt resources from 
+ deadlocked processes.
+
+    7.7.1 Process Termination
+     Abort all deadlocked processes(great expense); Abort one process at a time and check; 
+     Aborting a process is not easy(updation midst; printer etc); which process to choose - priority duration(done and needed); no. and type of resources used(easy 
+     to preempt or not); need[i]; how many more processes will be terminated to remove deadlock; interactive or batch process.
+
+    7.7.2 Resource Preemption
+     Selecting a victim: as before, like based on the abocve cost factors
+     Rollback: after preemption the process needs to be rollbacked as far as necessary to break the deadlock or more conviniently restart the process. 
+     Starvation: same process must not be preempted again and again. Possibility in cost based selection - solution - include no. of rollbacks in computin cost; fix
+     		 the number of rollbacks
+
+7.8 Summary
+
+Appendix
+7.5 Deadlock Avoidance
+    7.5.3 Banker's Algorithm
+    	  7.5.3.1 Safety Algorithm
+	   1. work = Available; finish[i] = false (for all i);
+	   2. Find i such that both: finish[i] = false; need[i] <= work; if no such i exists jump to step 4
+	   3. work = work + Allocation[i]; finish[i] = true;
+	   4. if no such i and finish[i] == true for all i, then SAFE, else UNSAFE
+
+	  7.5.3.2 Resource-Request algorithm
+	   1. if request[i] > need[i] raise error, else proceed
+	   2. if request[i] > available wait(), else proceed
+	   3. available = available - request[i]; need[i] = need[i] - request[i]; Allocation[i] = Allocation[i] + request[i]; if resulting state is safe then 
+	      allocate else wait().

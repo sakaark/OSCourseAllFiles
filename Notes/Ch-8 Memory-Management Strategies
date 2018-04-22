@@ -1,0 +1,107 @@
+Chapter 8 - Memory Management Strategies
+
+8.1 Background
+ Requirements of a memory subsystem: Relocation; Protection; Sharing
+
+    8.1.1 Basic Hardware
+     Main memory and the registers are the only things that the cpu has.
+     Protection: OS fills the limit and base reisters and for every instruction the "hardware" checks if the memory referenced is within the range.
+
+    8.1.2 Address Binding
+     Compile time; Load time; Execution time
+
+    8.1.3 Logical Versus Physical Address Space
+     Compile time and Load time address bindings generate same logical and physical addresses. In rest of the chapters we will talk about execution time binding.
+     Exection time adress binding is done by MMU(memory-managemen unit). A simple model for it: to every address generated within the limit register, the contents
+     of relocation register are added.
+
+    8.1.4 Dynamic Loading
+     Only parts of the program that are needed are loaded into the memory. Requires the programmer to program accordingly.
+
+    8.1.5 Dynamic Linking and Shared Libraries
+     Similar to dynamic loading in concept but support needs to be provided by the os.
+
+8.2 Swappping
+ When the cpu scheduler starts a process then it is checked whether the next process in the ready queue is in the main memory or not, if not then a process from the
+ main memory is swapped out and the other process is swapped in.
+ Disadvantages: Time consuming: swapping out a 10mb process realistically takes .258ms so the time slice should be substantially greater than .516ms, and for much
+ greater(in size) processes even more of time is required. solution: exactly how much of the process is used is to be known and loaded; processes with pending I/O:
+ solutions: never swap a process with pending I/O or execute I/O operations only in I/O buffers. If an I/O is already going on then don't swap.
+
+8.3 Contiguous Memory Allocation
+ Each process is contained in singlle contiguous section of the memory
+
+    8.3.1 Memory Mapping and Protection
+     cpu -> logical address -> limit and relocation registers -> memory. IMP: when cpu scheduler selects a process for execution, the dispatcher loads the relocation
+     and limit registers as a part of the context switch. An effective way to reduce the size of the operating system(eg device drivers not needed may not be loaded)
+
+    8.3.2 Memory Allocation
+     Multiple partition method; Fixed-partition scheme: holes, selecting from holes - first fit; best fit; worst fit.
+
+    8.3.3 Fragmentation
+     External fragmentation: when the total free size can accomodate a request but the holes are not contiguous. 50% rule: for every n blocks .5n blocks are lost.
+     Incase of multiple partition scheme there is internal fragmentation.
+     Solutions: Compaction: hurdles:compile time and load time binding; cost;
+     		Non contiguos memory allocation: Paging and segmentation.
+
+8.4 Paging
+    8.4.1 Basic Method 
+     Logical memory-pages, physical memory-frames, internal fragmentation only, pages typically 4kb and 8kb, backing store is itself divided into frames  
+     Math: page-table entry 4B(32 bits), frame size:4KB(12 bits)(Interesting!), then the physical memory has 2^44B = 16TB(every address has 4B)
+     Dynamic page tables-no. of pages are calculated and if there are these many frames then page table is assigned. See figure 8.10 for complete  clarification.
+     frame-table - one entry per frame: free or not, if not then what page and process.
+     important: copy of page table for each process maintained by os- used by cpu dispatcher to define the hadware page table when it is to be aloocated the cpu. 
+     		Hence increases context switch time
+
+    8.4.2 Hardware Support
+     Pointer to the page table for a process is stored in the PCB. When the dispatcher schedules a process then its page tables are loaded.
+     Problem: What if page table is very large(reasonable=256)(modern systems allow 1m pages)
+     Solution: PTBR(Page table base register): points to the location in the main memory containing the pagetable. Substantiallly reduces the context-switch time.
+     	       Problem: memory access becomes twice as expensive(we might as well swap!)
+	       Solution: TLB(fast lookup cache) contains key:value (page:frame) pairs. Any page request is first checked at all these simultaniously(PTBR not used!).
+	       		 (only 10% slower than direct access once!). If tlb miss then no other choice. TLB(Translation look-aside buffer):kernel pages are wired down
+			 Some TLBs use ASIDs for keeping multiple processes in TLB, else only 1 process can be in TLB
+			 Math: for 80% hit ratio: we get 40%extra time, for 98% hit ratio: we get 22%extra time.(Look Book for calculations)
+
+    8.4.3 Protection
+     Read, write, execute priviledges: bits are added to page tables. Whenever address is computed we match if the required operation matches the priviledges or not.
+     Valid invalid bits per entry in page table.
+     Problem due to internal fragmentation: we may access without any os trap the address which is not ours
+     Observation: A process rarely uses all of its address space. Solution: PTLR(Page Table Length Register) indicates the size of the page table.
+
+    8.4.4 Shared Pages
+     Wonderful! now it is clear what it was meant to attach a page to a process's memory!. 
+     To be sharable a code must be reentrant. Different processes can have same page table entry for a frame of that page. Hence only one copy in memory is needed.
+
+8.5 Structure of the Page Table
+    8.5.1 Hierarchical Paging
+     4GB main memory, page size = 4KB, page table entries = 1048576(~1m), each entry = 1B, total memory consumed in page table:4MB (we want it to be non contiguous)
+     A two level paging structure - forward mapped paging; the 20 bit space for page tables is divided into 2 10 bit spaces where 1st 10 bits give the outer page 
+     table and next 10 bits give inner page table(apart for 4mb for storing page table initially only 4kb is used for the outer page table)
+     Perfect for 32 bit logical space. Doesn't work for 64 bit logical address spaces
+
+    8.5.2 Hashed Page Tables
+     For 64 bit logical address spaces: the page part(p) of the address is mapped to a hash table and then the contents of the linked list are searched for the page
+     and then the corresponding frame is found. Variation-clustered page tables. Useful in sparse address spaces.
+
+Note that the scheme of TLB for fast lookup is still valid!
+
+    8.5.3 Inverted Page Tables
+     Page table is stored in order of actual memory(physical) rather than logical, thus increasing the search time. Advantage: one table for all the process.
+     Method to reduce search time: hashing.     
+
+8.6 Segementation
+ The logical memory is being segmented
+
+    8.6.1 Basic Method
+     The compiler itself segments the code into parts. Logical address is now a two tuple. 1st part is the segment number. 2nd part is the offset in the segment
+
+    8.6.2 Hardware
+     the segment number is checked in the segment table and the offset into the base number is added and looked into the physical memory.
+
+8.7 Example: The Intel Pentium
+    8.7.1 Pentium Segementation
+    8.7.2 Pentium Paging
+    8.7.3 Linux on Pentium Systems
+
+8.8 Summary

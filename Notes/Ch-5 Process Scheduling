@@ -1,0 +1,81 @@
+Chapter 5 - Process Scheduling
+
+It is the kernel level threads that are being scheduled.
+
+5.1 Basic Concept
+    5.1.1 CPU-I/O Burst Cycle
+     IO bound processes - a large number of short cpu bursts; CPU bound process may have a few long cpu bursts. see the fig 5.1 and 5.2.
+
+    5.1.2 CPU Scheduler
+     When cpu becomes idle it selects a process from ready queue(a fifo list or tree etc. and contains the pcbs of the processes), done by short-term(cpu) scheduler
+
+    5.1.3 Preemptive Scheduling
+     CPU scheduling decisions are made in following conditions: running to waiting(1), running to ready(2), waiting to ready(3), terminates(4).     
+     Points 1 and 4 - nonpreemptive or cooperative; otherwise it is preemptive.
+     In nonpreemptive scheduling, once a process has been allocated CPU it only releases it by terminating or switching to waiting state.
+     Disadvantages of preemptive scheduling: Processes accessing shared data(new mechanisms for accessing shared data), kernel is acting upon a system call and 
+     modifying importand data structures and a context switch happens while trying to modifyb or read from the same data structure, chaos ensues. do not let the 
+     context switch happpen untill the kernel has finished executiong the system call.
+      
+    5.1.4 Dispatcher
+     Passes control to the process selected by the short term scheduler. steps: context switch; switch to user mode; jump to the location in the user program and 
+     execute it. Dispatch Latency: time taken to stop one program and start another one.
+
+5.2 Scheduling Criteria
+ Systems perspective: CPU Utilization(we want to keep system as busy as possible); Throughput(processes completed per unit time)
+ Users' perspective: Turnaround time(measured per process; total time from when the process enters the ready queue to when it is completed); 
+ Waiting time(sum of times spent waiting in the ready queue); Response time(time from the submission of the request until the first response is produced; generally 
+ limited by the speed of the output device), generally scheduling algoritms affect the waiting time in ready queue, and not the time taken in execution or I/O.
+
+5.3 Scheduling Algorithms
+    5.3.1 First-Come, First-Served Scheduling
+     FCFS is nonpreemptive. Consider 24, 3, 3 in order 2,3,1 and 1,2,3 and compare the waiting times.
+     Convoy effect: 1 CPU bound process and other i/o bound process, cpu bound takess all the cpu and io all the time!!--inefficient use of cpu and io devices
+
+    5.3.2 Shortest-Job-First Scheduling
+     Also called shortest-next-CPU-burst algorithm. easier to do for long term scheduliing than short term scheduling. for short term scheduling the next cpu burst 
+     is calculated as T(n+1)= a.t(n) + (1-a)T(n). also called the exponential averaging. this type of scheduling can be preemptive or non-preemptive. For 
+     pre-emptive this is also called as shortest-remaining-time-first algorithm. (performs better than the non-preemptive version)
+
+    5.3.3 Priority Scheduling
+     Priority assigning bases on internal and external factors. pre-emptive and non-preemptive scheduling. Problems: aging!!
+
+    5.3.4 Round-Robin Scheduling
+     time quantum, rest is clear. For very large quantum it is no better than fcfs, for very short quantum and with n processes it would look like we have n 
+     processors with 1/n of the speed. It is obviously a preemptiv scheduling algorithm.
+
+    5.3.5 Multilevel Queue Scheduling
+     Instead of having all the processes to wait in the ready queue, we make furthir queues in the ready queue, where each queue has its own scheduling algorithm. 
+     (eg interactive processes can do rr whereas background processes can do fcfs), furthur there is scheduling among the various queues in the ready queue which is 
+     generally fixed-priority preemptive scheduling, it can also be rr with different time slices for different queues inside the ready queue.
+     Inherent problem: How do we assign process to a particular queue.
+
+    5.3.6 Multilevel Feedback-Queue Scheduling
+     Preemptive. Allows processes to move between the queues. Idea is to seperate the processes according to the characteristics of their cpu bursts. This scheme 
+     makes i/o bound and interactive processes with higher priority. example: 8,16,fcfs. in general a multilevel feedback queue is defined by: no. of queues; 
+     scheduling algo for each queue; when to upgrade or demote a process; which queue the process will enter when it needs service. most general (and complex) 
+     cpu scheduling algorithm.
+
+Parts 5.4 and 5.5 are not taught.
+5.4 Multi-Processor Scheduling
+    5.4.1 Approaches to Multiple-Processor Scheduling
+    5.4.2 Processor Affinity
+    5.4.3 Load Balancing
+    5.4.4 Symmetric Multithreading
+
+5.5 Thread Scheduling
+    5.5.1 Contention Scope
+    5.5.2 Pthread Scheduling
+
+5.6 Operating Systems Examples
+    5.6.1 Example: Solaris Sheduling
+    5.6.2 Example: Windows XP Scheduling
+    5.6.3 Example: Linux Scheduling
+
+5.7 Algorithm Evaluation
+    5.7.1 Deterministic Modeling
+    5.7.2 Queueing models
+    5.7.3 Simulations
+    5.7.4 Implementation
+
+5.8 Summary

@@ -1,0 +1,355 @@
+Chapter 6 - Synchronization
+ Cooperating processes can either directly share a logical address space(code and data), or be allowed to share data through messages. Former is achieved through 
+ threads. Concurrent access to shared data may create prolems and can result in inconsistency. This chapter will aim at ensuring orderly execution of former type 
+ of cooperating systems
+
+6.1 Background
+ see appendix for producer and consumer code. Prevention of race condition - process synchronization and coordination.
+
+6.2 The Critical-Section Problem
+ Critical section problem is to design a protocol that the processes can use to cooperate. Each process must ask permission to enter its critical section. Section of 
+ code implementing this request is called entry section. The critical section may be followed by an exit section. Rest of the code is called remainder section.
+ A critical problem solution must satisfy the following 3 rquirements: 
+  1. Mutual Exclusion: If process P1 is executing in critical section then no other process can be executing in critical section; 
+  2. Progress: If there are some processes who want to enter the critical section, and no process is currently executing its critical section then the decision as 
+     to who will enter the critical section will only depend on the processes not in the remainder section and decision cant be delayed indefinitely. 
+  3. Bounded Waiting: There exists a bound on the time, or no. of times that other processes are allowed to enter their critical sections after a process has made 
+     a request to enter its critical section and before that reques is granted.
+ (Windows XP was non premeptive kernel, so was linux before 2.6!)
+
+6.C Dekker's Algorithm (.C refers to being done in the class.)
+ (See Appendix for algos)
+ First algo - ME - yes (SEP - no), P - no (RSP - yes), BW - no (RP - no, RSP - yes)
+ Second Algo - ME - no (SEP - yes), P - yes (RSP - no), BW - no (RP -yes, RSP - no)
+ Third Algo - ME - yes (SEP - no), P - no (RSP - no, Reverse SEP - deadlock), BW - no (RP - yes, Reverse SEP - deadlock)
+ Fourth Algo - ME - yes (SEP - no), P - no (RSP - no, livelock), BW - no (RP - no, livelock)
+ Final algorithm - Perfect (only for two processes.)
+
+6.3 Peterson's Solution
+ Disclaimer: Because of the way modern architectures implement some machine instructions there is no guarantee that Peterson's solution will work there.
+ Importance: good algorithmic description of solving critical section problems and illustrates complexities in solving ME, P and BW.
+ See the code in the appendix..it is good. Prove all the 3 conditions for it.
+ Notes: spinlocks(busy waiting), assumes atomic load and store instructions.
+o
+6.4 Synchronization Hardware
+ TestAndSet(), Swap() and CaompareAndSwap()
+
+6.5 Semaphores
+ Hardware-based solutions are difficult for the programmer to use. So there is a synchronization tool callled a semaphore.
+ Semaphore is an integer that apart from initializatioon can only be accessed by 2 standard atomic operations. wait() and signal()
+ When one process modifies the semaphore value no other process should modify it. Also the complete wait() instruction must be executed without interruption.
+
+    6.5.1 Usage
+     Counting semaphore and binary semaphore(same wait() and signal() code for both of them). Binary semaphores are used as the solution for the critical section
+     problem by making a mutex(initializing it to 1) and an implementation is shown in appendix. We can also use a semaphore for other synchronization problems like 
+     making a process to occur after another process.
+     Counting semaphores can be used when there are multiple instances of a resource.
+
+    6.5.2 Implementation
+     Current model implements - Busy waiting(spinlocks-advantagious when locks are to be expected to be held for shorter periods of time).
+     Block and wakeup implementation(given in the appendix)
+     Signal and wait must not be executed simultaneously. So we need alternative locking techniques for it. (obvioously we gain somethings.)
+
+    6.5.3 Deadlocks and Starvation
+     In case of 2 semaphores by 2 processes deadlocks can occur. ex. P1 - wait(S); wait(Q); ..... P2 - wait(Q); wait(S);  with a possible interleaving a deadlock!
+     Starvation cant occur in the current scheme. In LIFO starvation may occur.
+     
+    6.5.C Priority Inversion
+     A higher priority process needs a lock held by a lower priority process. Solution - Priority Inversion.
+
+6.6 Classic Problems of Synchronization
+    6.6.1 The Bounded-Buffer Problem (The producer-consumer problem)
+     The classic solution - use of Counting semaphores where there are multiple instances of the resource, tremendoous synchronization. Inspiration for the solution:
+     Firstly the critical section is to be protected , so 1 semaphore for that, now we need to check if producer buffer is full which depends on whether consumer 
+     has taken from it or not, obviously we require synchronisation b/w 2 processes hence inspiring the use of semaphores. Similarly the use of full semaphore. 
+     Also every waiting use of similar while loops can be alternatively implemented as a semaphore.
+
+    6.6.2 The Readers-Writers Problem
+     First readers-writers problem, second readers-writers problem. Final para-acquiring reader and writer locks. multiple processes can have a reader lock, only 1 
+     a writers lock.
+
+    6.6.3 The Dining-Philosophers Problem
+     A code is given in the apppendix, but the problem is deadlocks and starvations. suppose all the philosophers pick thei left chopstick then?
+     Possible remedies: allow atmost 4 philosophers to sit; allow a philosopher to pick only if both the chopsticks are available(and both the chopsticks must be 
+     picked in the critical section.); asymmetric solution
+
+6.7 Monitors
+ Even 1 error in in any one section can be a nightmare to debug, moreover errors are not reproducible.
+
+    6.7.1 Usage
+     What does it mean: P waits for Q to leave the monitor or wait for another condition.
+     Monitor is not powerful in itself in the sense that it provides a higher level of synchroonization(though it was just that was needed.)
+     condition x, y; x.wait();, x.signal();
+
+    6.7.2 Dining-Philosophers Solution Using Monitors
+     done in the appendix
+
+    6.7.3 Implementing a Monitor Usiing Semaphores
+    6.7.4 Resuming Processor Within a Monitor
+
+Rest of the topics were not covered in the class.
+6.8 Synchronization Examples
+    6.8.1 Synchronization in Solaris
+    6.8.2 Synchronization in Windows XP
+    6.8.3 Synchronization in Linux
+    6.8.4 Synchronization in Pthreads
+
+6.9 Atomic Transactions
+    6.9.1 System Model
+    6.9.2 Log-Based Recovery
+    6.9.3 Checkpoints
+    6.9.4 Concurrent Atomic Transactions
+    	  6.9.4.1 Serializability
+	  6.9.4.2 Locking Protocol
+	  6.9.4.3 Timestamp-Based Protocols
+
+6.10 Summary
+
+Appendix - Abbreviations
+ME - Mutual Exclusion			SEP
+P - Progress				RSP
+BW - Bounded Waiting			RP (also RSP)
+SEP - Simultaneous Entry Problem
+RP - Repeat Problem
+RSP - Remainder Section Problem
+
+Appendix - CODES.
+6.1 Background
+ Producer code:
+  while(true){
+   while (counter == BUFFER_SIZE) ;
+   buffer[in] = nextProduced;
+   in = (in + 1) % BUFFER_SIZE;
+   counter++;
+  }
+
+ Consumer Code:
+  while(true){
+   while (counter == 0) ;
+   nextConsumed = buffer[out];
+   out = (out + 1) % BUFFER_SIZE;
+   counter--;
+  }
+
+6.C Dekker's Algorithm
+
+Dekker's first algorithm.
+ while(turn != 0) ;			while(turn != 1) ;
+ CRITICAL SECTION;			CRITICAL SECTION;		   
+ turn = 1;				turn = 0;
+
+Dekker's second algorithm.
+ while(flag[1]) ;			while(flag[0]) ;
+ flag[0] = 1;	      			flag[1] = 1;
+ CRITICAL SECTION;			CRITICAL SECTION;
+ flag[0] = 0;				flag[1] = 0;
+
+Dekker's third algorithm.
+ flag[0] = 1;				flag[1] = 1;
+ while(flag[1]) ;			while(flag[0]) ;
+ CRITICAL SECTION;			CRITICAL SECTION;
+ flag[0] = 0;				flag[1] = 0;
+
+Dekker's fourth algorithm.
+ flag[0] = 1;				flag[1] = 1;
+ while(flag[1]){			while(flag[0]){
+  flag[0] = 0;				 flag[1] = 0;
+  delay;   				 delay;
+  flag[0] = 1;				 flag[1] = 1;
+ }	    				}
+ CRITICAL SECTION;			CRITICAL SECTION;
+ flag[0] = 0;				flag[1] = 0;
+
+Dekker's final Algorithm.
+ flag[0] = 1;				flag[1] = 1;
+ while(flag[1]){			while(flag[0]){
+  if(turn != 0){			 if(turn != 1){
+   flag[0] = 0;				  flag[1] = 0;
+   while(turn != 0) ;			  while(turn != 1) ;
+   flag[0] = 1;	    			  flag[1] = 1;
+  }	     				 }
+ }					}
+ CRITICAL SECTION;			CRITICAL SECTION;
+ turn = 1;				turn = 0;
+ flag[0] = 0;				flag[1] = 0;
+
+6.3 Peterson's Algorithm
+Peterson's elegant algorithm:
+ flag[i] = 1;
+ turn = j;
+ while((flag[j] == 1) && (turn == j)) ;
+ CRITICAL SECTION;
+ flag[i] = 0;
+
+6.4 Synchronization Hardware
+Atomic TestAndSet()
+ boolean TestAndSet(boolean *target){
+  boolean rv = *target;
+  *target = 1;
+  return rv;
+ }
+
+Mutual Exclusion using bounded waiting:
+ while(TestAndSet(&lock)) ;
+ CRITICAL SECTION;
+ lock = 0;
+
+Atomic Swap()
+ void Swap(boolean *a, boolean*b){
+  boolean temp = *a;
+  *a = *b;
+  *b = temp;
+ }
+
+Mutual Exclusion using atomic Swap()
+ key = 1;
+ while(key) Swap(&key, &lock);
+ CRITICAL SECTION;
+ lock = 0;
+
+Complete answer using TestAndSet()
+ waiting[i] = 1;
+ key = 1;
+ while(waiting[i] && key) key = TestAndSet(&lock);
+ CRITICAL SECTION;
+ j = (i + 1) % n;
+ while ((j != i) && (waiting[j] != 1)) j = (i + 1) % n;
+ if (j == i) lock = 0; else waiting[j] = 0;
+
+CompareAndSwap()
+ int CompareAndSwap(int *reg, int oldval, int newval){
+  int old = *reg;
+  if (old == oldval) *reg = newval;
+  return old;
+ }
+
+6.5 Semaphores
+ wait(S){
+  while(S <= 0) ;
+  S--;
+ }
+
+ signal(S){
+  S++;
+ }
+
+    6.5.1 Usage
+     (mutex is initialized to 1)
+     wait(mutex);
+     CRITICAL SECTION;
+     signal(S);
+
+    6.5.2 Implementation
+     Block and wakeup implementation
+     Semaphore is now a structure:
+      typedef struct{
+       int value;
+       struct process *list;
+      }semaphore;
+
+     Wait fuction:
+      wait(semaphore *S){
+       S->value--;
+       if (S->value < 0){
+        add this process to S->list;
+	block();
+       }
+      }
+
+     Signal fuction:
+      signal(semaphore *S){
+       S->value++;
+       if (S->value <= 0){
+        remove process P from S->list;	
+	wakeup(P);
+       }
+      }
+
+6.6 Classic Problems of Synchronization
+    6.6.1 The Bounded-Buffer Problem (Producer-Consumer Problem)
+    empty is initialized to n, full to 0, and mutex ofcourse to 1; full - how many are there to be consumed; empty - maximum that can be produced at the moment;
+     while(1){								while(1){
+      //produce the item						 wait(full);
+      wait(empty);  							 wait(mutex);
+      wait(mutex);							 //remove the item from the buffer
+      //add the item to the buffer					 signal(mutex);
+      signal(mutex);  	    						 signal(empty);
+      signal(full);							 //consume the item
+     }									}
+
+    6.6.2 The Readers-Writers Problem
+     while(1){								while(1){
+      wait(mutex)							 wait(wrt);
+      readcount++;							 //WRITE HERE
+      if(readcount == 1) wait(wrt);					 signal(wrt);
+      signal(mutex);							}
+      //READ HERE	
+      wait(mutex);
+      readcount--;
+      if(readcount == 0) signal(wrt);
+      signal(mutex);
+     }
+
+    6.6.3 The Dining-Philosophers Problem
+     while(1){
+      wait(chopstick[i]);
+      wait(chopstick[i+1]);
+      //EAT
+      signal(chopstick[i]);
+      signal(chopstick[i+1]);
+     }
+
+6.7 Monitors
+    6.7.1 Usage
+    6.7.2 Dining-Philosophers Solution Using Monitors
+     monitor DiningPhilosophers {
+      enum {THINKING; HUNGRY; EATING} state[5];
+      condition self[5];
+
+      void pickup(int i){
+       state[i] = HUNGRY;
+       test(i);
+       if(state[i] != EATING)
+        self[i].wait();
+      }
+
+      void putdown(int i){
+       state[i] = THINKING;
+       test((i + 1) % 5);
+       test((i + 4) % 5);
+      }
+
+      void test(int i){
+       if(state[(i + 4) % 5] != EATING) && (state[i] == HUNGRY) && (state[(i + 1) % 5] != EATING){
+        state[i] = EATING;
+	self[i].signal();
+       }
+      }
+
+      void initialization_code(){
+       for(i=0; i<5; i++)
+        state[i] = THINKING;
+      }
+     }
+     
+     6.7.3 Implementing Monitors using Semaphores
+     wait(mutex);
+     //body of F
+     if(next_count > 0) signal(next);
+     else signal(mutex);
+
+     x.wait():
+      x_count++;
+      if(next_count > 0) signal(next);
+      else signal(mutex);
+      wait(x_sem);
+      x_count--;
+
+     x.signal():
+      if(x_count > 0){
+       signal(x_sem);
+       wait(next);
+       next_count--;
+      }
+
+----for the end: monitors using semaphores & readers writers using semaphores.

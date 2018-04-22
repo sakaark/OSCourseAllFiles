@@ -1,0 +1,93 @@
+Chapter-3 PROCESS CONCEPT
+
+3.1 Overview
+    3.1.1 The Process
+     Process in memory: text, processor registers, heap of dynamically allocated memory, stack which contains temporary data
+     Process, and Program
+
+    3.1.2 Process State
+     State of the process: current activity of the process
+     States: New, Ready, Running, Waiting, Terminated
+
+    3.1.3 Process Control Block
+     Representation of process in OS: PCB
+     It contains: Process state, PC, CPU Registers, CPU Scheduling Info, Memory management Info, Accounting info,I/O staus info
+
+    3.1.4 Threads
+     A process can have more than one threads and hence do more than one task at a time
+
+3.2 Process Scheduling
+    3.2.1 Scheduling Queues
+     Scheduling queues(of process PCBs): job queues, device queues, child queues
+
+    3.2.2 Schedulers
+     Long-term Schedulers and short-term schedulers.
+     Short-term schedulers: need to be fast as the frequency of switching can be very fast(sometimes we may require scheduling after ms incase IO is called avg:100ms)
+     Long-term schedulers: control the degree of multi-programming- need to schdelule only when a process ends, avg~minutes
+     Long-term schedulers need to carefully select b/w cpu bound and i/o bound processes for efficiency, some systems(like unix, ms nt) may require no such schedulers
+     and all the processes go directly to short term schedulers, where as some systems may use mid-ter schedulers(swapping) for proper selection b/w i/o and cpu
+     bound processes
+
+    3.2.3 Context Switch
+     Context switch: save state(PCB), and load state.
+
+3.3 Operations on Processes
+    3.3.1 Process Creation
+     Process: children and parents, pid, ps -el, parents may pass certain resources to their children
+     Execution possibilities: parents and children execute concurrently, parents wait until some or all children have terminated.
+     Address space possibiliites: child a duplicate of parent, child has a new program loaded in it.
+     New process created by fork(), allows parent and children processes to communicate nicely(they have the same copy of the address space)(return code for fork 
+     is zero for the child process and non-zero for the parent processs.)
+
+    3.3.2 Process Termination
+     Process can exit using the exit() system call. A proccess can cause another process to terminate(generally only a parent process.)
+     Reasons for parents killing the chilren: child has exceeded its resource usage; task assigned to the child is no longer required; Parent is exiting(Cascading te-
+     rmination)
+
+3.4 Interprocess Communication
+ Independent and cooperating processses. Cooperating processes: Information sharing, computational speedup, modularity, convenience.
+ IPC: Message Passing: for smaller data(no conflicts need be avoided), easier to implement, slower(system calls)   Shared Memory: Fast, system calls req to set up
+
+    3.4.1 Shared-Memory Systems
+     producer consumer problem can be solved using shared memory. Code: shared buffer, in, out variables. fig 3.13-14 contain the code for producer and consumer.
+
+    3.4.2 Message Passing Systems
+     Logical implementation message-passing systems have three aspects namely: 
+     Direct or indirect communication; Sychronous or asynchronous communication; Automatic or explicit buffering.
+
+    	  3.4.2.1 Naming
+	   Direct communication: symmetric and asymmetric. Disadvantage: If I change the identifier all the references to that identifier need be changed.
+	   Indirect Communication: mailboxes or ports, more than 1 links can be established b/w processes, each link can have more than one processes.
+	   	    		   2 types of mailboxes can be there: OS owned, process owned: process owned(in its PCB): it can only receive messages in it.
+				   os owned: creation of mailbox(by a process(it becomes its owner)), shifting ownership.
+
+	  3.4.2.2 Synchronization
+	   Blocking and non-blocking also known as synchronous and asynchronous. blocking/nonblocking send and receive
+	   rendezvous: blocking send and receive - easy solution to the producer consumer problem.
+
+	  3.4.2.3 Buffering
+	   Messages exchanged by communicating procces reside inside a queue queues can be (last two are the automatic buffering):
+	   Zero Capacity: 0 length, sender must block; Bounded Capacity: length n if full then sender must block; Unbounded capacity: sender may choose to never block
+
+3.5 Examples of IPC Systems
+    3.5.1 An Example: POSIX Shared Memory
+     Create a shared memory using shmget(), a process attaches it to its address space using shmat(), sprintf to write to shared memory, shmdt() to detach, shmctl()
+     to remove the shared memory from the system memory. 
+
+    3.5.2 An Example: Mach
+     Mach kernel supports creation and destruction of multiple tasks, similar to threads but have multiple threads of control. All communication involving all 
+     communication and multitask information is carried out using system calls is carried out using messages which are sent and received to mailboxes called ports.
+     Definately read from the book -  a good reaad.
+
+    3.5.3 An Example: Windows XP
+     left     
+
+//rest was not taught in the class.
+3.6 Communication in Client-server Systems
+    3.6.1 Sockets
+    3.6.2 Remote Procedure Calls
+    3.6.3 Remote Method Invokation
+
+3.7 Summary
+
+Project - UNIX Shell and History Feature

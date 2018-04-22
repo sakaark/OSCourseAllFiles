@@ -1,0 +1,94 @@
+CHAPTER - 2: SYSTEM STRUCTURES
+ Viewpoints: services, ui, components(interconnections); user, programmer, os designer.
+
+2.1 Operating System Services
+ user services: UI,Program Execution, I/O Operations, File-System  Manipulation, Communications, Error detection
+ system services: Resource allocation, Accounting, Protection and Security
+
+2.2 User Operating-System Interface
+    2.2.1 Command Interpreter
+     shells-command interpreters: 2 types of commands - 1. shell knows -(UNIX implements through system programs), 2. shell invokes system calls.     
+
+    2.2.2 Graphical User Interfaces
+
+2.3 System Calls
+ interface to os services, eg: copying one file to another(system calls in I/O, open input file(error detection), make output file, read, write(error detection))
+ programmer never sees this level of detail: developers design according to APIs(Win32 APIs, POSIX APIs, Java APIs)
+ system-call-interface serves as a link to system calls made available by os, it intercepts function calls from APIs and invokes necessary system calls in the os.
+
+2.4 Types of System Calls
+    2.4.1 Process Control
+     program needs to halt its excecution normally or abnormally, error dump(-debugger), controlshift  always to command interpreter, levels of errors(0 = no error)
+     loading and executing another program and control its execution
+     time profile, at every interrupt value of pc is noted, we now knoe time spent at various programs
+
+    2.4.2 File Management
+     create, read, write, reposition, file attributes, 
+
+    2.4.3 Device Management
+     resources controlled by os: devices.once the device has been requested andd allocated we can do things just like files with them
+
+    2.4.4 Information Maintenance
+     call to return date, current users, version np. info about processes etc. inshort transfer of info b/w user and os.
+
+    2.4.5 Communication
+     message passing: indirectly(common mailbox) establish connection(hostid, process id), and then read/write commands, and then close connection
+     shared-memory modelcreate and attach shared memory
+
+2.5 System Programs
+ hardware -> os -> system programs -> application progrmas
+ provide convenient environment for program execution and development, some, are simply interfaces to system calls, others are much more complex.
+ File Management, Status Information, File Modification(Editors), Programming Language Support(Compilers,Interpreters), Program loading and execution,communications
+
+2.6 Operating-System Design and Implementation
+    2.6.1 Design Goals
+     Depends on hardware and type of system: batch, time shared, single user, distributed, realtime, general purpose
+     user goals(and that too of different type of users) and system goals, -> ambiguity here and no fixed way out.
+
+    2.6.2 Mechanisms and Policies
+     differentiate between policy and mechanism, in short between what and hoow too do a thing respectively.
+     
+    2.6.3 Implementation
+     Mostly written in C/C++ with small parts of codes written in assembly, writing codes in C/C++ make them kind of harware independent
+     Major improvements in os is the result of better data structures and algorithms,only a small amount of code like cpu scheduling, memory manager etc is critical
+     to high performance, so only these parts can be implemented in assembly and rest in high-level language
+
+2.7 Operating-System Structures
+    2.7.1 Simple Structure
+     MS-DOS(began as simple monolithic structure but expanded soon), UNIX(some strucuture but too much overloading at the kernel)
+
+    2.7.2 Layered Approach
+     Layered structure where each layer is an abstract object made up of data and operations that manipulate those data. Every layer can access only layer below it
+     design and implementation of the system is simplified
+     Difficulty-appropriately defining the different layers, and they generally tend to be less effiecient than their counterparts
+
+    2.7.3 Microkernels
+     Microkernels:removing all the nonessential stuff from the kernel and implementing as system or user level programs,provide minimal proces and memory management
+     Benefits: Extending the operating system, security(faliure of 1 service doesnt affect others)
+     Disadvantage: Slow :( (Shift from windowsnt to xp(monolithic))
+
+    2.7.4 Modules
+     Using object orientd programming techniques to create modular kernels
+     Allows for certain features to be implemented dynamically(different from miccrockernel because we dont need message passing to communicate)
+
+2.8 Virtual Machines
+    2.8.1 Implementation
+     virtual user mode and virtual system mode
+
+    2.8.2 Benefits
+     protection, good for the development of os
+
+    2.8.3 Examples
+    	  2.8.3.1 VMware
+	  2.8.3.2 Java Virtual Machine
+
+2.9 Operating System Generation
+ easy to implement over 1 machine, more common to implement os over a class of machines and then configure or generate it for each computer site 
+ -> system generation(SYSGEN)
+
+2.10 System Boot
+ Bootstrap Loader
+
+2.11 Summary
+
+Project - Adding a System Call to the Linux Kernel

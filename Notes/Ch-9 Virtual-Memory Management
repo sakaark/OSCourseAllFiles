@@ -1,0 +1,57 @@
+Chapter 9 - Virtual-Memory Management
+ Allows execution of processes that are not completely in the memory(logical address space is viewed to be as large as needed). Frees us from memory  storage limits
+ Allows to share files easily and implement shared memory
+
+9.1 Background
+
+9.2 Demand Paging
+    9.2.1 Basic Concepts
+    9.2.2 Performance of Demand Paging
+
+9.3 Copy-on-Write
+
+9.4 Page Replacement
+    9.4.1 Basic Page Replacement
+    9.4.2 FIFO Page Replacement
+    9.4.3 Optimal Page Replacement
+    9.4.4 LRU Page Replacement
+    9.4.5 LRU-Approximation Page Replacement
+    	  9.4.5.1 Additional-Reference-its Algorithm
+	  9.4.5.2 Second-Chance Algorithm
+	  9.4.5.3 Enhanced Second-Chance Algorithm
+    9.4.6 Counting-Based Page Replacement
+    9.4.7 Page-Buffering Algorithms
+    9.4.8 Applications and Page Replacement
+
+9.5 Allocation of Frames
+    9.5.1 Minimum Number of Frames
+    9.5.2 Allocation of Frames
+    9.5.3 Global versus Local Allocation
+
+9.6 Thrashing
+    9.6.1 Causes of Thrashing
+    9.6.2 Working-Set Model
+    9.6.3 Page-Fault Frequency
+
+9.7 Memory-Mapped Files
+    9.7.1 Basic Mechanism
+    9.7.2 Shared Memory in the Win32 API
+    9.7.3 Memory-Mapped I/O
+
+9.8 Allocating Kernel Memory
+    9.8.1 Buddy Sysem
+    9.8.2 Slab Allocation
+
+9.9 Other Considerations
+    9.9.1 Prepaging
+    9.9.2 Page Size
+    9.9.3 TLB Reach
+    9.9.4 Inverted Page Tables
+    9.9.5 Program Structure
+    9.9.6 I/O Interlock
+
+9.10 Operating-System Examples
+    9.10.1 Windows XP
+    9.10.2 Solaris
+
+9.11 Summary
